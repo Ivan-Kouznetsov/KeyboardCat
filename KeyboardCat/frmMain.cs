@@ -19,6 +19,10 @@ namespace KeyboardCat
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            Settings settings = Settings.Load("settings.json");
+            this.timerKeyDown.Interval = settings.KeyDownTimeOut;
+            this.timerNoKeyPress.Interval = settings.NoKeyDownTimeOut;
+
             rdoCatOff.Checked = true;
             rdoCatOn.Checked = false;
             hookHandler = new WindowsKeyboard.HookHandlerDelegate(KeyboardHookHandler);
@@ -35,7 +39,8 @@ namespace KeyboardCat
         private IntPtr KeyboardHookHandler(int nCode, IntPtr wParam, ref WindowsKeyboard.KBDLLHOOKSTRUCT lParam) 
         {
 #if DEBUG
-            Debug.WriteLine(nCode + " " + wParam + " " + lParam.flags + " " + lParam.vkCode);
+            Debug.WriteLine((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond).ToString() + "ms: "+ nCode 
+                + " " + wParam + " " + lParam.flags + " " + lParam.vkCode);
 #endif
             if (CatMode)
             {
@@ -52,11 +57,11 @@ namespace KeyboardCat
                 {
                     if (WindowsKeyboard.IsKeyDown(wParam)) 
                     {
-                        KeyDownTimer.Start();
+                        timerKeyDown.Start();
                     }
                     else if (WindowsKeyboard.IsKeyUp(wParam)) 
                     {    
-                        KeyDownTimer.Stop();
+                        timerKeyDown.Stop();
                     }
                 }                
             }
@@ -64,16 +69,16 @@ namespace KeyboardCat
             return WindowsKeyboard.CallNextHookEx(keyboardHandlerId, nCode, wParam, ref lParam);
         }
 
-        private void KeyboardTimer_Tick(object sender, EventArgs e)
+        private void TimerKeyPress_Tick(object sender, EventArgs e)
         {
-            KeyDownTimer.Stop();
+            timerKeyDown.Stop();
             rdoCatOn.PerformClick();
         }
 
-        private void NoKeyPressTimer_Tick(object sender, EventArgs e)
+        private void TimerNoKeyPress_Tick(object sender, EventArgs e)
         {
             const int CoolDownTime = 500;
-            if (!KeyDownTimer.Enabled &&
+            if (!timerKeyDown.Enabled &&
                 keypressLog.Count > 0 &&
                 ((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - keypressLog.Last()) > CoolDownTime)
             {

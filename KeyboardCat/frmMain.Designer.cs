@@ -33,8 +33,8 @@
             this.rdoCatOn = new System.Windows.Forms.RadioButton();
             this.rdoCatOff = new System.Windows.Forms.RadioButton();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.KeyDownTimer = new System.Windows.Forms.Timer(this.components);
-            this.NoKeyPressTimer = new System.Windows.Forms.Timer(this.components);
+            this.timerKeyDown = new System.Windows.Forms.Timer(this.components);
+            this.timerNoKeyPress = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // rdoCatOn
@@ -70,16 +70,16 @@
             // 
             // KeyDownTimer
             // 
-            this.KeyDownTimer.Interval = 300;
-            this.KeyDownTimer.Tick += new System.EventHandler(this.KeyboardTimer_Tick);
+            this.timerKeyDown.Interval = 200;
+            this.timerKeyDown.Tick += new System.EventHandler(this.TimerKeyPress_Tick);
             // 
             // NoKeyPressTimer
             // 
-            this.NoKeyPressTimer.Enabled = true;
-            this.NoKeyPressTimer.Interval = 500;
-            this.NoKeyPressTimer.Tick += new System.EventHandler(this.NoKeyPressTimer_Tick);
+            this.timerNoKeyPress.Enabled = true;
+            this.timerNoKeyPress.Interval = 500;
+            this.timerNoKeyPress.Tick += new System.EventHandler(this.TimerNoKeyPress_Tick);
             // 
-            // frmMain
+            // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -91,7 +91,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmMain";
+            this.Name = "FrmMain";
             this.Text = "Keyboard Cat";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FrmMain_Load);
@@ -105,8 +105,8 @@
         private System.Windows.Forms.RadioButton rdoCatOn;
         private System.Windows.Forms.RadioButton rdoCatOff;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.Timer KeyDownTimer;
-        private System.Windows.Forms.Timer NoKeyPressTimer;
+        private System.Windows.Forms.Timer timerKeyDown;
+        private System.Windows.Forms.Timer timerNoKeyPress;
     }
 }
 

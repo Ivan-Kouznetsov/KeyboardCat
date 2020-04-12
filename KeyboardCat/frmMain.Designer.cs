@@ -1,6 +1,6 @@
 ﻿namespace KeyboardCat
 {
-    partial class frmMain
+    partial class FrmMain
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.rdoCatOn = new System.Windows.Forms.RadioButton();
             this.rdoCatOff = new System.Windows.Forms.RadioButton();
             this.lblStatus = new System.Windows.Forms.Label();
@@ -94,7 +94,7 @@
             this.Name = "frmMain";
             this.Text = "Keyboard Cat";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.frmMain_Load);
+            this.Load += new System.EventHandler(this.FrmMain_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

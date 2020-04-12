@@ -17,10 +17,13 @@ namespace KeyboardCat
         private const int VK_ARROW_START = 37;
         private const int VK_ARROW_END = 40;
 
+        private const int KEY_DOWN = 256;
+        private const int KEY_UP = 257;
+
         public struct KBDLLHOOKSTRUCT
         {
             public int vkCode; 
-            public int flags;
+            public int flags;          
         }
 
         public delegate IntPtr HookHandlerDelegate(int nCode, IntPtr wParam, ref KBDLLHOOKSTRUCT lParam);
@@ -52,6 +55,16 @@ namespace KeyboardCat
                     vkCode == VK_SHIFT ||
                     vkCode == VK_VOLUME_DOWN ||
                     vkCode == VK_VOLUME_UP || (vkCode >= VK_ARROW_START && vkCode <= VK_ARROW_END));
+        }
+
+        public static bool IsKeyDown(IntPtr wParam) 
+        {
+            return wParam.ToInt32() == KEY_DOWN;
+        }
+
+        public static bool IsKeyUp(IntPtr wParam)
+        {
+            return wParam.ToInt32() == KEY_UP;
         }
     }
 }

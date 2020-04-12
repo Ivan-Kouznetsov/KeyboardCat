@@ -6,53 +6,62 @@ using System.Windows.Forms;
 
 namespace KeyboardCat
 {
-    public partial class frmMain : Form
+    public partial class FrmMain : Form
     {
         private IntPtr keyboardHandlerId;
         private WindowsKeyboard.HookHandlerDelegate hookHandler;
         private bool CatMode { get { return rdoCatOn.Checked; } }
         private readonly List<long> keypressLog = new List<long>();
-        public frmMain()
+        public FrmMain()
         {
             InitializeComponent();
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
+        private void FrmMain_Load(object sender, EventArgs e)
         {
             rdoCatOff.Checked = true;
             rdoCatOn.Checked = false;
             hookHandler = new WindowsKeyboard.HookHandlerDelegate(KeyboardHookHandler);
 
             keyboardHandlerId = WindowsKeyboard.SetLowLevelHook(hookHandler);
+            this.FormClosing += FrmMain_FormClosing;
+        }
+
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            WindowsKeyboard.UnhookWindowsHookEx(keyboardHandlerId);
         }
 
         private IntPtr KeyboardHookHandler(int nCode, IntPtr wParam, ref WindowsKeyboard.KBDLLHOOKSTRUCT lParam) 
         {
+#if DEBUG
+            Debug.WriteLine(nCode + " " + wParam + " " + lParam.flags + " " + lParam.vkCode);
+#endif
             if (CatMode)
             {
-                keypressLog.Add(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
-                return (IntPtr)1;
+                // only ignore keydown events to prevent Ctrl, Shift, etc. from sticking
+                if (WindowsKeyboard.IsKeyDown(wParam))
+                {                
+                    keypressLog.Add(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
+                    return (IntPtr)1;
+                }
             }
             else
             {
-                 Debug.WriteLine(string.Format("nCode {0} wParam{1} lParam.flags{2} lParam.vkCode{3} time:{4}", nCode, wParam, lParam.flags, lParam.vkCode, DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond));
                 if (!WindowsKeyboard.IsSpecialKey(lParam))
                 {
-                    const int KeyDown = 256;
-                    const int KeyUp = 257;
-
-                    switch (wParam.ToInt32())
+                    if (WindowsKeyboard.IsKeyDown(wParam)) 
                     {
-                        case KeyDown:
-                            KeyDownTimer.Start();
-                            break;
-                        case KeyUp:
-                            KeyDownTimer.Stop();
-                            break;
+                        KeyDownTimer.Start();
                     }
-                }
-                return WindowsKeyboard.CallNextHookEx(keyboardHandlerId, nCode, wParam, ref lParam);
+                    else if (WindowsKeyboard.IsKeyUp(wParam)) 
+                    {    
+                        KeyDownTimer.Stop();
+                    }
+                }                
             }
+
+            return WindowsKeyboard.CallNextHookEx(keyboardHandlerId, nCode, wParam, ref lParam);
         }
 
         private void KeyboardTimer_Tick(object sender, EventArgs e)
@@ -66,7 +75,10 @@ namespace KeyboardCat
             const int CoolDownTime = 500;
             if (!KeyDownTimer.Enabled &&
                 keypressLog.Count > 0 &&
-                ((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - keypressLog.Last()) > CoolDownTime) rdoCatOff.PerformClick();
+                ((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - keypressLog.Last()) > CoolDownTime)
+            {
+                rdoCatOff.PerformClick();
+            }
         }
     }
 }

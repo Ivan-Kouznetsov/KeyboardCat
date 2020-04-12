@@ -28,13 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.rdoCatOn = new System.Windows.Forms.RadioButton();
             this.rdoCatOff = new System.Windows.Forms.RadioButton();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.timerKeyDown = new System.Windows.Forms.Timer(this.components);
-            this.timerNoKeyPress = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // rdoCatOn
@@ -68,17 +65,6 @@
             this.lblStatus.TabIndex = 3;
             this.lblStatus.Text = "Cat Mode:";
             // 
-            // KeyDownTimer
-            // 
-            this.timerKeyDown.Interval = 200;
-            this.timerKeyDown.Tick += new System.EventHandler(this.TimerKeyPress_Tick);
-            // 
-            // NoKeyPressTimer
-            // 
-            this.timerNoKeyPress.Enabled = true;
-            this.timerNoKeyPress.Interval = 500;
-            this.timerNoKeyPress.Tick += new System.EventHandler(this.TimerNoKeyPress_Tick);
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -105,8 +91,6 @@
         private System.Windows.Forms.RadioButton rdoCatOn;
         private System.Windows.Forms.RadioButton rdoCatOff;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.Timer timerKeyDown;
-        private System.Windows.Forms.Timer timerNoKeyPress;
     }
 }
 

@@ -23,7 +23,13 @@ namespace KeyboardCat
         public struct KBDLLHOOKSTRUCT
         {
             public int vkCode; 
-            public int flags;          
+            public int flags;
+
+            public KBDLLHOOKSTRUCT(int vkCode, int flags)
+            {
+                this.vkCode = vkCode;
+                this.flags = flags;
+            }
         }
 
         public delegate IntPtr HookHandlerDelegate(int nCode, IntPtr wParam, ref KBDLLHOOKSTRUCT lParam);

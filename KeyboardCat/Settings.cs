@@ -10,21 +10,21 @@ namespace KeyboardCat
 {
     public class Settings
     {
-        private const int DefaultKeyDownTimeOut = 250;
-        private const int DefaultNoKeyDownTimeOut = 500;
+        private const int DefaultTimeBetweenKeyPresses = 250;
+        private const int DefaultCoolDownTime = 500;
 
-        public int KeyDownTimeOut { get; private set; }
-        public int NoKeyDownTimeOut { get; private set; }
+        public int TimeBetweenKeyPresses { get; private set; }
+        public int CoolDownTime { get; private set; }
 
-        public Settings(int keyDownTimeOut, int noKeyDownTimeOut)
+        public Settings(int timeBetweenKeyPresses, int coolDownTime)
         {
-            KeyDownTimeOut = keyDownTimeOut;
-            NoKeyDownTimeOut = noKeyDownTimeOut;
+            TimeBetweenKeyPresses = timeBetweenKeyPresses;
+            CoolDownTime = coolDownTime;
         }
 
         public static Settings Load(string fileName) 
         {
-            Settings settings = new Settings(DefaultKeyDownTimeOut, DefaultNoKeyDownTimeOut);
+            Settings settings = new Settings(DefaultTimeBetweenKeyPresses, DefaultCoolDownTime);
 
             if (File.Exists(fileName))
             {

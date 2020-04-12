@@ -10,8 +10,27 @@ namespace KeyboardCat
     {
         private IntPtr keyboardHandlerId;
         private WindowsKeyboard.HookHandlerDelegate hookHandler;
-        private bool CatMode { get { return rdoCatOn.Checked; } }
+        private bool CatMode { 
+            get 
+            { 
+                return rdoCatOn.Checked; 
+            } 
+            set 
+            {
+                if (value)
+                {
+                    rdoCatOn.Checked = true;
+                    rdoCatOff.Checked = false;
+                }
+                else 
+                {
+                    rdoCatOn.Checked = false;
+                    rdoCatOff.Checked = true;
+                }
+            } 
+        }
         private readonly List<long> keypressLog = new List<long>();
+        private CatDetector catDetector;
         public FrmMain()
         {
             InitializeComponent();
@@ -20,9 +39,8 @@ namespace KeyboardCat
         private void FrmMain_Load(object sender, EventArgs e)
         {
             Settings settings = Settings.Load("settings.json");
-            this.timerKeyDown.Interval = settings.KeyDownTimeOut;
-            this.timerNoKeyPress.Interval = settings.NoKeyDownTimeOut;
-
+            catDetector = new CatDetector(settings.TimeBetweenKeyPresses);
+          
             rdoCatOff.Checked = true;
             rdoCatOn.Checked = false;
             hookHandler = new WindowsKeyboard.HookHandlerDelegate(KeyboardHookHandler);
@@ -42,6 +60,8 @@ namespace KeyboardCat
             Debug.WriteLine((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond).ToString() + "ms: "+ nCode 
                 + " " + wParam + " " + lParam.flags + " " + lParam.vkCode);
 #endif
+            CatMode = CatMode || catDetector.IsCat(WindowsKeyboard.IsSpecialKey(lParam), nCode, wParam, lParam);
+
             if (CatMode)
             {
                 // only ignore keydown events to prevent Ctrl, Shift, etc. from sticking
@@ -50,40 +70,9 @@ namespace KeyboardCat
                     keypressLog.Add(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
                     return (IntPtr)1;
                 }
-            }
-            else
-            {
-                if (!WindowsKeyboard.IsSpecialKey(lParam))
-                {
-                    if (WindowsKeyboard.IsKeyDown(wParam)) 
-                    {
-                        timerKeyDown.Start();
-                    }
-                    else if (WindowsKeyboard.IsKeyUp(wParam)) 
-                    {    
-                        timerKeyDown.Stop();
-                    }
-                }                
-            }
+            }            
 
             return WindowsKeyboard.CallNextHookEx(keyboardHandlerId, nCode, wParam, ref lParam);
-        }
-
-        private void TimerKeyPress_Tick(object sender, EventArgs e)
-        {
-            timerKeyDown.Stop();
-            rdoCatOn.PerformClick();
-        }
-
-        private void TimerNoKeyPress_Tick(object sender, EventArgs e)
-        {
-            const int CoolDownTime = 500;
-            if (!timerKeyDown.Enabled &&
-                keypressLog.Count > 0 &&
-                ((DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - keypressLog.Last()) > CoolDownTime)
-            {
-                rdoCatOff.PerformClick();
-            }
         }
     }
 }

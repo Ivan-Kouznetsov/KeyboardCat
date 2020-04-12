@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace KeyboardCat
@@ -31,6 +32,7 @@ namespace KeyboardCat
         }
         private readonly List<long> keypressLog = new List<long>();
         private CatDetector catDetector;
+        Settings settings;
         public FrmMain()
         {
             InitializeComponent();
@@ -38,7 +40,7 @@ namespace KeyboardCat
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            Settings settings = Settings.Load("settings.json");
+            settings = Settings.Load("settings.json");
             catDetector = new CatDetector(settings.TimeBetweenKeyPresses);
           
             rdoCatOff.Checked = true;
@@ -66,13 +68,23 @@ namespace KeyboardCat
             {
                 // only ignore keydown events to prevent Ctrl, Shift, etc. from sticking
                 if (WindowsKeyboard.IsKeyDown(wParam))
-                {                
+                {
                     keypressLog.Add(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
                     return (IntPtr)1;
+                }
+                else 
+                {
+                    timerNoKeyPress.Start();
                 }
             }            
 
             return WindowsKeyboard.CallNextHookEx(keyboardHandlerId, nCode, wParam, ref lParam);
+        }
+
+        private void TimerNoKeyPress_Tick(object sender, EventArgs e)
+        {
+            timerNoKeyPress.Stop();
+            CatMode = catDetector.GetKeyboardEventCount(settings.CoolDownTime) > 0;
         }
     }
 }

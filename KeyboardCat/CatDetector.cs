@@ -10,37 +10,42 @@ namespace KeyboardCat
     {
         // All time-related values are in ms
 
-        private readonly List<(long TimeStamp, long HashCode)> keyPressLog = new List<(long TimeStamp, long HashCode)>();
+        private readonly List<(long TimeStamp, long HashCode)> keyboardEventLog = new List<(long TimeStamp, long HashCode)>();
         private readonly int timeBetweenKeyPresses;
+
+        public CatDetector(int timeBetweenKeyPresses)
+        {
+            this.timeBetweenKeyPresses = timeBetweenKeyPresses;
+        }
 
         public bool IsCat(bool isSpecialKey, int nCode, IntPtr wParam, WindowsKeyboard.KBDLLHOOKSTRUCT lParam) 
         {
            
             bool result = false;
-            int hash = GetKeyPressHash(nCode, wParam, lParam);
+            int hash = GetKeyboardEventHash(nCode, wParam, lParam);
 
             if (!isSpecialKey)
             {                
-                if (keyPressLog.Count > 0)
+                if (keyboardEventLog.Count > 0)
                 {
-                    if (keyPressLog.Last().HashCode == hash &&
-                       (GetTimeStamp() - keyPressLog.Last().TimeStamp) < timeBetweenKeyPresses)
+                    if (keyboardEventLog.Last().HashCode == hash &&
+                       (GetTimeStamp() - keyboardEventLog.Last().TimeStamp) < timeBetweenKeyPresses)
                     {                        
                         result = true;
                     }
                 }                
             }
 
-            keyPressLog.Add((GetTimeStamp(), hash));
+            keyboardEventLog.Add((GetTimeStamp(), hash));
             return result;
         }
 
-        public CatDetector(int timeBetweenKeyPresses) 
+        public int GetKeyboardEventCount(int timeframe) 
         {
-            this.timeBetweenKeyPresses = timeBetweenKeyPresses;
-        }
+            return keyboardEventLog.FindAll(k => k.TimeStamp > (GetTimeStamp() - timeframe)).Count();
+        } 
 
-        private static int GetKeyPressHash(int nCode, IntPtr wParam, WindowsKeyboard.KBDLLHOOKSTRUCT lParam)
+        private static int GetKeyboardEventHash(int nCode, IntPtr wParam, WindowsKeyboard.KBDLLHOOKSTRUCT lParam)
         {
             return (nCode.ToString() + wParam.ToInt32().ToString() + lParam.flags.ToString() + lParam.vkCode.ToString()).GetHashCode();
         }
